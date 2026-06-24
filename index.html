@@ -5,26 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>CoinQuest - Tap & Earn</title>
     
-    <!-- ===== MONETAG AD TAG (HEAD এ বসান) ===== -->
-    <script>
-        // Monetag Ad Script - আপনার দেওয়া কোড
+    <!-- ===== MONETAG VERIFICATION META TAG ===== -->
+    <meta name="monetag" content="ae71a4978e3f03f5623096dfee2528e6">
+    
+    <!-- ===== MONETAG AD SCRIPT ===== -->
+    <script type="text/javascript">
+        // Monetag Ad Script - আপনার অ্যাড আইডি বসান
         (function() {
             var s = document.createElement('script');
             s.type = 'text/javascript';
             s.async = true;
-            s.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX'; // আপনার GA ID বসান
+            // ⚠️ আপনার Monetag দেওয়া স্ক্রিপ্ট URL এখানে বসান
+            s.src = 'https://cdn.monetag.com/your-script-id.js';
             var x = document.getElementsByTagName('script')[0];
             x.parentNode.insertBefore(s, x);
         })();
-
-        // Monetag Placement ID
-        window.monetag = window.monetag || {};
-        monetag.placementId = 'YOUR_PLACEMENT_ID'; // আপনার Placement ID বসান
-        
-        // Monetag Events
-        monetag.onReward = function() {
-            console.log('Reward earned!');
-        };
     </script>
     <!-- ===== এড ট্যাগ শেষ ===== -->
     
@@ -331,55 +326,57 @@
         const database = firebase.database();
 
         // ==================== MONETAG AD FUNCTIONS ====================
+        // চেক করুন Monetag লোড হয়েছে কিনা
+        function isMonetagLoaded() {
+            return typeof show_11197472 === 'function';
+        }
+
         // ===== Rewarded Interstitial =====
         function showRewardedInterstitial(callback) {
-            console.log('Showing Rewarded Interstitial Ad...');
-            
-            // আপনার দেওয়া Monetag Rewarded Interstitial কোড
-            show_11197472().then(() => {
-                // You need to add your user reward function here
-                // which will be executed after the user watches the ad.
+            if (isMonetagLoaded()) {
+                show_11197472().then(() => {
+                    if (callback) callback();
+                }).catch((e) => {
+                    console.log('Ad error:', e);
+                    if (callback) callback();
+                });
+            } else {
+                console.log('Monetag not loaded, skipping ad');
                 if (callback) callback();
-            }).catch((e) => {
-                console.log('Ad error:', e);
-                // এড দেখাতে না পারলে সরাসরি রিওয়ার্ড দিন
-                if (callback) callback();
-            });
+            }
         }
 
         // ===== Rewarded Popup =====
         function showRewardedPopup(callback) {
-            console.log('Showing Rewarded Popup Ad...');
-            
-            // আপনার দেওয়া Monetag Rewarded Popup কোড
-            show_11197472('pop').then(() => {
-                // user watch ad till the end or close it in interstitial format
-                // your code to reward user for rewarded format
+            if (isMonetagLoaded()) {
+                show_11197472('pop').then(() => {
+                    if (callback) callback();
+                }).catch((e) => {
+                    console.log('Popup Ad error:', e);
+                    if (callback) callback();
+                });
+            } else {
+                console.log('Monetag not loaded, skipping ad');
                 if (callback) callback();
-            }).catch((e) => {
-                // user get error during playing ad
-                // do nothing or whatever you want
-                console.log('Popup Ad error:', e);
-                // এড দেখাতে না পারলে সরাসরি রিওয়ার্ড দিন
-                if (callback) callback();
-            });
+            }
         }
 
         // ===== In-app Interstitial =====
         function showInAppInterstitial() {
-            console.log('Showing In-app Interstitial Ad...');
-            
-            // আপনার দেওয়া Monetag In-app Interstitial কোড
-            show_11197472({
-                type: 'inApp',
-                inAppSettings: {
-                    frequency: 2,
-                    capping: 0.1,
-                    interval: 30,
-                    timeout: 5,
-                    everyPage: false
-                }
-            });
+            if (isMonetagLoaded()) {
+                show_11197472({
+                    type: 'inApp',
+                    inAppSettings: {
+                        frequency: 2,
+                        capping: 0.1,
+                        interval: 30,
+                        timeout: 5,
+                        everyPage: false
+                    }
+                });
+            } else {
+                console.log('Monetag not loaded, skipping ad');
+            }
         }
 
         // ==================== TG ====================
@@ -642,7 +639,7 @@
             claimWeeklyReward(day);
         }
 
-        // ===== Rewarded Interstitial Ad দিয়ে উইকলি বোনাস ক্লেইম =====
+        // ===== Rewarded Interstitial Ad - উইকলি বোনাস =====
         function watchAdAndClaim(day) {
             const today = new Date().getDay();
             if (day !== today) {
@@ -652,9 +649,7 @@
 
             showToast('⏳ Loading ad... Please wait');
             
-            // Rewarded Interstitial Ad দেখান
             showRewardedInterstitial(function() {
-                // এড দেখার পর রিওয়ার্ড দিন
                 if (!appState.weeklyAdWatched) appState.weeklyAdWatched = [];
                 if (!appState.weeklyAdWatched.includes(day)) {
                     appState.weeklyAdWatched.push(day);
@@ -761,6 +756,7 @@
             }
         }
 
+        // ===== In-app Interstitial - উইথড্রো =====
         function withdraw() {
             const usdBalance = appState.usdBalance || 0;
             const minWithdraw = appState.minWithdraw || 10;
@@ -770,7 +766,6 @@
                 return;
             }
 
-            // ===== In-app Interstitial Ad দেখান =====
             showInAppInterstitial();
 
             const withdrawAmount = usdBalance;
@@ -1454,11 +1449,11 @@
             renderTasks(category);
         }
 
+        // ===== Rewarded Popup - টাস্ক কমপ্লিট =====
         function completeTask(taskId) {
             const task = tasks.find(t => t.id === taskId);
             if (!task || appState.tasksCompleted.includes(taskId)) return;
 
-            // ===== এড টাস্ক হলে Rewarded Popup দেখান =====
             if (task.type === 'ad') {
                 showRewardedPopup(function() {
                     completeTaskAction(taskId);
