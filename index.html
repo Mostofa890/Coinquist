@@ -35,16 +35,19 @@
         .avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 24px; }
         .user-details h3 { font-size: 18px; margin-bottom: 4px; }
         .user-details .last-login { font-size: 11px; color: #94a3b8; margin-top: 2px; }
-        .level-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 12px; font-size: 12px; }
+        .level-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 12px; font-size: 12px; cursor: pointer; transition: all 0.3s; }
+        .level-badge:active { transform: scale(0.95); }
         
-        /* ===== LEVEL PROGRESS ===== */
-        .level-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px; margin-top: 8px; }
+        /* ===== LEVEL SECTION ===== */
+        .level-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px; margin-top: 8px; cursor: pointer; transition: all 0.3s; }
+        .level-section:active { transform: scale(0.98); }
         .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
         .level-section .level-title { font-size: 14px; font-weight: bold; }
         .level-section .level-number { font-size: 20px; font-weight: bold; color: #fbbf24; }
         .level-section .level-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 8px; overflow: hidden; }
         .level-section .level-progress .progress-fill-level { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; transition: width 0.5s; }
         .level-section .level-points { font-size: 11px; color: #94a3b8; margin-top: 4px; display: flex; justify-content: space-between; }
+        .level-section .level-arrow { color: #94a3b8; font-size: 16px; }
         
         .balance-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 16px; text-align: center; margin-top: 12px; }
         .balance-label { font-size: 14px; color: #94a3b8; }
@@ -168,6 +171,48 @@
         .banned-overlay .ban-reason { background: #1a1f3a; padding: 16px; border-radius: 12px; margin-top: 16px; max-width: 400px; color: #fbbf24; border: 1px solid rgba(239,68,68,0.3); }
         .banned-overlay .ban-time { color: #6b7280; font-size: 12px; margin-top: 8px; }
         .main-content.hide { display: none; }
+        
+        /* ===== LEVEL PAGE (OVERLAY) ===== */
+        .level-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #0a0e27; z-index: 9999; display: none; overflow-y: auto; padding-bottom: 100px; }
+        .level-overlay.show { display: block; }
+        .level-overlay .level-header { background: linear-gradient(135deg, #1e3a8a, #5b21b6); padding: 20px; position: sticky; top: 0; z-index: 10; display: flex; align-items: center; gap: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+        .level-overlay .level-header .back-btn { background: rgba(255,255,255,0.15); border: none; color: white; padding: 8px 16px; border-radius: 10px; cursor: pointer; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .level-overlay .level-header h2 { font-size: 20px; flex: 1; text-align: center; margin-right: 60px; }
+        .level-overlay .level-content { padding: 16px; }
+        .level-overlay .current-level-card { background: #1a1f3a; border-radius: 16px; padding: 20px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .level-overlay .current-level-card .level-emoji { font-size: 48px; }
+        .level-overlay .current-level-card .level-number { font-size: 32px; font-weight: bold; color: #fbbf24; }
+        .level-overlay .current-level-card .level-title { font-size: 18px; color: #94a3b8; }
+        .level-overlay .current-level-card .level-points { font-size: 14px; color: #94a3b8; margin-top: 8px; }
+        .level-overlay .current-level-card .level-progress { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 12px; overflow: hidden; }
+        .level-overlay .current-level-card .level-progress .fill { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 4px; transition: width 0.5s; }
+        .level-overlay .current-level-card .level-progress-text { display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        .level-overlay .reward-section { background: #1a1f3a; border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
+        .level-overlay .reward-section .reward-title { font-size: 14px; color: #94a3b8; margin-bottom: 8px; }
+        .level-overlay .reward-section .reward-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .level-overlay .reward-section .reward-item:last-child { border-bottom: none; }
+        .level-overlay .reward-section .reward-item .icon { font-size: 18px; }
+        .level-overlay .reward-section .reward-item .desc { font-size: 14px; }
+        .level-overlay .reward-section .reward-item .value { color: #fbbf24; font-weight: bold; font-size: 14px; }
+        .level-overlay .filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+        .level-overlay .filter-tabs .tab { padding: 6px 16px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #94a3b8; cursor: pointer; font-size: 13px; white-space: nowrap; transition: all 0.3s; }
+        .level-overlay .filter-tabs .tab.active { background: linear-gradient(135deg, #7c3aed, #2563eb); border-color: transparent; color: white; }
+        .level-overlay .level-list-title { font-size: 18px; font-weight: bold; margin: 16px 0; display: flex; align-items: center; gap: 10px; }
+        .level-overlay .level-list-title span { font-size: 14px; color: #94a3b8; font-weight: normal; }
+        .level-overlay .level-item { background: #1a1f3a; border-radius: 12px; padding: 12px 16px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; border: 1px solid rgba(255,255,255,0.05); transition: all 0.3s; }
+        .level-overlay .level-item.active { border-color: #fbbf24; background: rgba(251,191,36,0.05); }
+        .level-overlay .level-item.locked { opacity: 0.5; }
+        .level-overlay .level-item .level-info { display: flex; align-items: center; gap: 12px; }
+        .level-overlay .level-item .level-info .num { font-size: 16px; font-weight: bold; color: #94a3b8; min-width: 30px; }
+        .level-overlay .level-item .level-info .name { font-size: 14px; }
+        .level-overlay .level-item .level-info .emoji { font-size: 20px; }
+        .level-overlay .level-item .level-info .badge { font-size: 10px; padding: 2px 8px; border-radius: 10px; background: rgba(251,191,36,0.2); color: #fbbf24; }
+        .level-overlay .level-item .level-reward { font-size: 13px; color: #22c55e; }
+        .level-overlay .level-item .level-check { color: #22c55e; font-size: 18px; }
+        .level-overlay .level-list { max-height: 400px; overflow-y: auto; padding-right: 4px; }
+        .level-overlay .level-list::-webkit-scrollbar { width: 4px; }
+        .level-overlay .level-list::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 2px; }
+        .level-overlay .level-list::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 2px; }
     </style>
 </head>
 <body>
@@ -191,6 +236,56 @@
         </div>
     </div>
 
+    <!-- ===== LEVEL OVERLAY ===== -->
+    <div class="level-overlay" id="levelOverlay">
+        <div class="level-header">
+            <button class="back-btn" onclick="closeLevelPage()"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2>🏆 Level System</h2>
+        </div>
+        <div class="level-content">
+            <!-- Current Level Card -->
+            <div class="current-level-card" id="levelCurrentCard">
+                <div class="level-emoji" id="levelCurrentEmoji">🥉</div>
+                <div class="level-number" id="levelCurrentNumber">Level 1</div>
+                <div class="level-title" id="levelCurrentTitle">Bronze</div>
+                <div class="level-points" id="levelCurrentPoints">0 / 100 XP</div>
+                <div class="level-progress">
+                    <div class="fill" id="levelProgressFill2" style="width: 0%;"></div>
+                </div>
+                <div class="level-progress-text">
+                    <span id="levelProgressText">0%</span>
+                    <span id="levelNextInfo">Next Level: 2</span>
+                </div>
+            </div>
+
+            <!-- Level Rewards -->
+            <div class="reward-section">
+                <div class="reward-title">🎁 Current Level Rewards</div>
+                <div class="reward-item"><span class="icon">🪙</span><span class="desc">Bonus Earnings</span><span class="value" id="levelBonusPercent">+2%</span></div>
+                <div class="reward-item"><span class="icon">📋</span><span class="desc">Exclusive Tasks</span><span class="value" id="levelExclusiveTasks">🔒 Locked</span></div>
+                <div class="reward-item"><span class="icon">🎯</span><span class="desc">Daily Bonus</span><span class="value" id="levelDailyBonus">+10 Coins</span></div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="tab active" data-filter="all" onclick="filterLevels('all', this)">📋 All</button>
+                <button class="tab" data-filter="bronze" onclick="filterLevels('bronze', this)">🥉 Bronze</button>
+                <button class="tab" data-filter="silver" onclick="filterLevels('silver', this)">🥈 Silver</button>
+                <button class="tab" data-filter="gold" onclick="filterLevels('gold', this)">🥇 Gold</button>
+                <button class="tab" data-filter="platinum" onclick="filterLevels('platinum', this)">💎 Platinum</button>
+                <button class="tab" data-filter="diamond" onclick="filterLevels('diamond', this)">👑 Diamond</button>
+            </div>
+
+            <!-- Level List -->
+            <div class="level-list-title">
+                📊 All Levels <span id="levelCount">100 Levels</span>
+            </div>
+            <div class="level-list" id="levelList">
+                <div class="loading"><div class="loading-spinner"></div><p>Loading levels...</p></div>
+            </div>
+        </div>
+    </div>
+
     <!-- ===== MAIN CONTENT ===== -->
     <div class="container main-content" id="mainContent">
         <div class="header">
@@ -199,7 +294,7 @@
                 <div class="user-details">
                     <h3 id="userName">User</h3>
                     <div class="last-login" id="lastLoginDisplay">📅 Last Login: --</div>
-                    <span class="level-badge" id="userLevel">Level 1</span>
+                    <span class="level-badge" id="userLevelBadge" onclick="openLevelPage()">Level 1 👆</span>
                 </div>
             </div>
             <div class="balance-card">
@@ -209,10 +304,11 @@
                 <div class="total-usd-earned" id="totalUsdEarned">💵 Total USD Earned: $0.00</div>
                 
                 <!-- ===== LEVEL SECTION ===== -->
-                <div class="level-section" id="levelSection">
+                <div class="level-section" id="levelSection" onclick="openLevelPage()">
                     <div class="level-row">
                         <span class="level-title" id="levelTitle">🥉 Bronze</span>
                         <span class="level-number" id="levelNumber">Level 1</span>
+                        <span class="level-arrow">➜</span>
                     </div>
                     <div class="level-progress">
                         <div class="progress-fill-level" id="levelProgressFill" style="width: 0%;"></div>
@@ -445,6 +541,7 @@
         let remainingSeconds = 0;
         let isTapping = false;
         let weeklyRewards = [10, 15, 20, 25, 30, 40, 50];
+        let currentFilter = 'all';
 
         const userRef = database.ref('users/' + userId);
         const tasksRef = database.ref('tasks');
@@ -457,59 +554,52 @@
         const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         // ==================== LEVEL SYSTEM (1-100) ====================
+        const LEVEL_TIERS = [
+            { min: 1, max: 10, name: 'Bronze', emoji: '🥉', bonus: 2 },
+            { min: 11, max: 25, name: 'Silver', emoji: '🥈', bonus: 5 },
+            { min: 26, max: 50, name: 'Gold', emoji: '🥇', bonus: 10 },
+            { min: 51, max: 75, name: 'Platinum', emoji: '💎', bonus: 20 },
+            { min: 76, max: 100, name: 'Diamond', emoji: '👑', bonus: 30 }
+        ];
+
+        function getLevelTier(level) {
+            for (let tier of LEVEL_TIERS) {
+                if (level >= tier.min && level <= tier.max) return tier;
+            }
+            return LEVEL_TIERS[0];
+        }
+
         function calculateLevelData(coins, tasks, taps, streak, withdrawals) {
-            // পয়েন্ট ক্যালকুলেশন
             let points = Math.floor((coins * 1) + (tasks * 50) + (taps * 0.1) + (streak * 10) + (withdrawals * 100));
             
-            // লেভেল ক্যালকুলেশন (১ থেকে ১০০ পর্যন্ত)
             let level = 1;
             let totalRequired = 0;
-            
             for (let i = 1; i <= 100; i++) {
                 totalRequired += i * 100;
-                if (points >= totalRequired) {
-                    level = i;
-                } else {
-                    break;
-                }
+                if (points >= totalRequired) level = i;
+                else break;
             }
             
-            // লেভেল টাইটেল
-            let title = '';
-            let bonus = 0;
-            let emoji = '';
-            
-            if (level >= 76) { title = 'Diamond'; emoji = '👑'; bonus = 30; }
-            else if (level >= 51) { title = 'Platinum'; emoji = '💎'; bonus = 20; }
-            else if (level >= 26) { title = 'Gold'; emoji = '🥇'; bonus = 10; }
-            else if (level >= 11) { title = 'Silver'; emoji = '🥈'; bonus = 5; }
-            else { title = 'Bronze'; emoji = '🥉'; bonus = 2; }
-            
-            // বর্তমান লেভেলের জন্য মোট প্রয়োজনীয় পয়েন্ট
             let currentLevelTotal = 0;
             for (let i = 1; i <= level; i++) {
                 currentLevelTotal += i * 100;
             }
             
-            // পরবর্তী লেভেলের জন্য মোট প্রয়োজনীয় পয়েন্ট
-            let nextLevelTotal = currentLevelTotal + ((level + 1) * 100);
-            
-            // প্রগ্রেস পার্সেন্টেজ
             let progress = ((points - currentLevelTotal) / ((level + 1) * 100)) * 100;
             if (progress > 100) progress = 100;
             if (progress < 0) progress = 0;
             
+            let tier = getLevelTier(level);
+            
             return {
                 level: level,
-                title: title,
-                emoji: emoji,
-                bonus: bonus,
                 points: points,
                 currentLevelTotal: currentLevelTotal,
-                nextLevelTotal: nextLevelTotal,
                 progress: Math.floor(progress),
                 requiredForNext: (level + 1) * 100,
-                isMaxLevel: level >= 100
+                isMaxLevel: level >= 100,
+                tier: tier,
+                nextTier: level < 100 ? getLevelTier(level + 1) : null
             };
         }
 
@@ -522,7 +612,10 @@
                 appState.withdrawHistory ? appState.withdrawHistory.length : 0
             );
             
-            document.getElementById('levelTitle').textContent = `${levelData.emoji} ${levelData.title}`;
+            const tier = levelData.tier;
+            
+            // Homepage Level Section
+            document.getElementById('levelTitle').textContent = `${tier.emoji} ${tier.name}`;
             document.getElementById('levelNumber').textContent = `Level ${levelData.level}`;
             document.getElementById('levelProgressFill').style.width = `${levelData.progress}%`;
             
@@ -535,12 +628,111 @@
                 document.getElementById('levelNextPoints').textContent = `/ ${levelData.requiredForNext}`;
             }
             
-            // ইউজার লেভেল ব্যাজ আপডেট
-            document.getElementById('userLevel').textContent = `Level ${levelData.level}`;
-            
-            // লেভেল ডাটা সেভ
+            document.getElementById('userLevelBadge').textContent = `Level ${levelData.level} 👆`;
             appState.userLevel = levelData.level;
-            appState.userLevelData = levelData;
+            
+            // Level Overlay
+            updateLevelOverlay(levelData);
+        }
+
+        function updateLevelOverlay(levelData) {
+            const tier = levelData.tier;
+            
+            document.getElementById('levelCurrentEmoji').textContent = tier.emoji;
+            document.getElementById('levelCurrentNumber').textContent = `Level ${levelData.level}`;
+            document.getElementById('levelCurrentTitle').textContent = tier.name;
+            
+            if (levelData.isMaxLevel) {
+                document.getElementById('levelCurrentPoints').textContent = `🏆 MAX LEVEL!`;
+                document.getElementById('levelProgressFill2').style.width = '100%';
+                document.getElementById('levelProgressText').textContent = '100%';
+                document.getElementById('levelNextInfo').textContent = '⭐ MAX LEVEL';
+            } else {
+                const currentPoints = levelData.points - levelData.currentLevelTotal;
+                document.getElementById('levelCurrentPoints').textContent = `${currentPoints} / ${levelData.requiredForNext} XP`;
+                document.getElementById('levelProgressFill2').style.width = `${levelData.progress}%`;
+                document.getElementById('levelProgressText').textContent = `${levelData.progress}%`;
+                document.getElementById('levelNextInfo').textContent = `Next Level: ${levelData.level + 1}`;
+            }
+
+            document.getElementById('levelBonusPercent').textContent = `+${tier.bonus}%`;
+            document.getElementById('levelDailyBonus').textContent = `${10 + tier.bonus} Coins`;
+            
+            const isExclusive = levelData.level >= 10;
+            document.getElementById('levelExclusiveTasks').textContent = isExclusive ? '✅ Unlocked' : '🔒 Locked';
+            document.getElementById('levelExclusiveTasks').style.color = isExclusive ? '#22c55e' : '#94a3b8';
+        }
+
+        // ==================== LEVEL OVERLAY FUNCTIONS ====================
+        function openLevelPage() {
+            document.getElementById('levelOverlay').classList.add('show');
+            document.getElementById('mainContent').classList.add('hide');
+            document.querySelector('.bottom-nav').style.display = 'none';
+            renderLevelList();
+        }
+
+        function closeLevelPage() {
+            document.getElementById('levelOverlay').classList.remove('show');
+            document.getElementById('mainContent').classList.remove('hide');
+            document.querySelector('.bottom-nav').style.display = 'flex';
+        }
+
+        function renderLevelList() {
+            const container = document.getElementById('levelList');
+            const levelData = calculateLevelData(
+                appState.balance || 0,
+                appState.completedTasks || 0,
+                appState.tapCount || 0,
+                appState.dailyStreak || 0,
+                appState.withdrawHistory ? appState.withdrawHistory.length : 0
+            );
+
+            let html = '';
+            let totalRequired = 0;
+            
+            for (let i = 1; i <= 100; i++) {
+                totalRequired += i * 100;
+                const tier = getLevelTier(i);
+                const isUnlocked = levelData.level >= i;
+                const isCurrent = levelData.level === i;
+                
+                // Filter check
+                if (currentFilter !== 'all') {
+                    const filterMap = {
+                        'bronze': [1,10],
+                        'silver': [11,25],
+                        'gold': [26,50],
+                        'platinum': [51,75],
+                        'diamond': [76,100]
+                    };
+                    const range = filterMap[currentFilter];
+                    if (!range || i < range[0] || i > range[1]) continue;
+                }
+                
+                html += `
+                    <div class="level-item ${isCurrent ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}">
+                        <div class="level-info">
+                            <span class="num">${i}</span>
+                            <span class="emoji">${tier.emoji}</span>
+                            <span class="name">${tier.name}</span>
+                            ${isCurrent ? '<span class="badge">👈 Current</span>' : ''}
+                            ${!isUnlocked ? '<span class="badge" style="background:rgba(239,68,68,0.2);color:#ef4444;">🔒</span>' : ''}
+                        </div>
+                        <div class="level-reward">+${tier.bonus}% Bonus</div>
+                        ${isCurrent ? '<div class="level-check">✅</div>' : ''}
+                    </div>
+                `;
+            }
+
+            document.getElementById('levelCount').textContent = `${100} Levels`;
+            container.innerHTML = html;
+        }
+
+        function filterLevels(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-tabs .tab').forEach(t => t.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+            renderLevelList();
         }
 
         // ==================== WEEKLY BONUS SYSTEM ====================
@@ -570,7 +762,6 @@
         function updateWeeklyUI() {
             const today = new Date();
             const weekKey = getWeekKey(today);
-            const weekStart = getWeekStart(today);
             
             if (!appState.weekStart || appState.weekStart !== weekKey) {
                 appState.weekStart = weekKey;
@@ -1580,6 +1771,7 @@
         // ==================== TAB SYSTEM ====================
         function switchTab(tab, event) {
             if (document.getElementById('weeklyOverlay').classList.contains('show')) return;
+            if (document.getElementById('levelOverlay').classList.contains('show')) return;
             
             document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
             if (event && event.currentTarget) {
