@@ -10,18 +10,15 @@
     
     <!-- ===== MONETAG AD SCRIPT ===== -->
     <script type="text/javascript">
-        // Monetag Ad Script - আপনার অ্যাড আইডি বসান
         (function() {
             var s = document.createElement('script');
             s.type = 'text/javascript';
             s.async = true;
-            // ⚠️ আপনার Monetag দেওয়া স্ক্রিপ্ট URL এখানে বসান
             s.src = 'https://cdn.monetag.com/your-script-id.js';
             var x = document.getElementsByTagName('script')[0];
             x.parentNode.insertBefore(s, x);
         })();
     </script>
-    <!-- ===== এড ট্যাগ শেষ ===== -->
     
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -39,6 +36,16 @@
         .user-details h3 { font-size: 18px; margin-bottom: 4px; }
         .user-details .last-login { font-size: 11px; color: #94a3b8; margin-top: 2px; }
         .level-badge { display: inline-block; background: rgba(255,255,255,0.2); padding: 2px 12px; border-radius: 12px; font-size: 12px; }
+        
+        /* ===== LEVEL PROGRESS ===== */
+        .level-section { background: rgba(255,255,255,0.05); border-radius: 12px; padding: 12px 16px; margin-top: 8px; }
+        .level-section .level-row { display: flex; justify-content: space-between; align-items: center; }
+        .level-section .level-title { font-size: 14px; font-weight: bold; }
+        .level-section .level-number { font-size: 20px; font-weight: bold; color: #fbbf24; }
+        .level-section .level-progress { width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+        .level-section .level-progress .progress-fill-level { height: 100%; background: linear-gradient(135deg, #fbbf24, #f59e0b); border-radius: 3px; transition: width 0.5s; }
+        .level-section .level-points { font-size: 11px; color: #94a3b8; margin-top: 4px; display: flex; justify-content: space-between; }
+        
         .balance-card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 16px; text-align: center; margin-top: 12px; }
         .balance-label { font-size: 14px; color: #94a3b8; }
         .balance-amount { font-size: 42px; font-weight: 800; background: linear-gradient(to right, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
@@ -200,6 +207,23 @@
                 <div class="balance-amount" id="balance">0</div>
                 <div class="usd-value" id="usdValue">≈ $0.00 USD</div>
                 <div class="total-usd-earned" id="totalUsdEarned">💵 Total USD Earned: $0.00</div>
+                
+                <!-- ===== LEVEL SECTION ===== -->
+                <div class="level-section" id="levelSection">
+                    <div class="level-row">
+                        <span class="level-title" id="levelTitle">🥉 Bronze</span>
+                        <span class="level-number" id="levelNumber">Level 1</span>
+                    </div>
+                    <div class="level-progress">
+                        <div class="progress-fill-level" id="levelProgressFill" style="width: 0%;"></div>
+                    </div>
+                    <div class="level-points">
+                        <span id="levelCurrentPoints">0</span>
+                        <span id="levelNextPoints">/ 100</span>
+                    </div>
+                </div>
+                <!-- ===== LEVEL SECTION END ===== -->
+                
                 <div class="conversion-timer">
                     <div class="label">⏰ Next Auto Conversion</div>
                     <div class="time" id="conversionCountdown">--:--:--</div>
@@ -326,56 +350,25 @@
         const database = firebase.database();
 
         // ==================== MONETAG AD FUNCTIONS ====================
-        // চেক করুন Monetag লোড হয়েছে কিনা
         function isMonetagLoaded() {
             return typeof show_11197472 === 'function';
         }
 
-        // ===== Rewarded Interstitial =====
         function showRewardedInterstitial(callback) {
             if (isMonetagLoaded()) {
-                show_11197472().then(() => {
-                    if (callback) callback();
-                }).catch((e) => {
-                    console.log('Ad error:', e);
-                    if (callback) callback();
-                });
-            } else {
-                console.log('Monetag not loaded, skipping ad');
-                if (callback) callback();
-            }
+                show_11197472().then(() => { if (callback) callback(); }).catch((e) => { if (callback) callback(); });
+            } else { if (callback) callback(); }
         }
 
-        // ===== Rewarded Popup =====
         function showRewardedPopup(callback) {
             if (isMonetagLoaded()) {
-                show_11197472('pop').then(() => {
-                    if (callback) callback();
-                }).catch((e) => {
-                    console.log('Popup Ad error:', e);
-                    if (callback) callback();
-                });
-            } else {
-                console.log('Monetag not loaded, skipping ad');
-                if (callback) callback();
-            }
+                show_11197472('pop').then(() => { if (callback) callback(); }).catch((e) => { if (callback) callback(); });
+            } else { if (callback) callback(); }
         }
 
-        // ===== In-app Interstitial =====
         function showInAppInterstitial() {
             if (isMonetagLoaded()) {
-                show_11197472({
-                    type: 'inApp',
-                    inAppSettings: {
-                        frequency: 2,
-                        capping: 0.1,
-                        interval: 30,
-                        timeout: 5,
-                        everyPage: false
-                    }
-                });
-            } else {
-                console.log('Monetag not loaded, skipping ad');
+                show_11197472({ type: 'inApp', inAppSettings: { frequency: 2, capping: 0.1, interval: 30, timeout: 5, everyPage: false } });
             }
         }
 
@@ -463,6 +456,93 @@
 
         const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+        // ==================== LEVEL SYSTEM (1-100) ====================
+        function calculateLevelData(coins, tasks, taps, streak, withdrawals) {
+            // পয়েন্ট ক্যালকুলেশন
+            let points = Math.floor((coins * 1) + (tasks * 50) + (taps * 0.1) + (streak * 10) + (withdrawals * 100));
+            
+            // লেভেল ক্যালকুলেশন (১ থেকে ১০০ পর্যন্ত)
+            let level = 1;
+            let totalRequired = 0;
+            
+            for (let i = 1; i <= 100; i++) {
+                totalRequired += i * 100;
+                if (points >= totalRequired) {
+                    level = i;
+                } else {
+                    break;
+                }
+            }
+            
+            // লেভেল টাইটেল
+            let title = '';
+            let bonus = 0;
+            let emoji = '';
+            
+            if (level >= 76) { title = 'Diamond'; emoji = '👑'; bonus = 30; }
+            else if (level >= 51) { title = 'Platinum'; emoji = '💎'; bonus = 20; }
+            else if (level >= 26) { title = 'Gold'; emoji = '🥇'; bonus = 10; }
+            else if (level >= 11) { title = 'Silver'; emoji = '🥈'; bonus = 5; }
+            else { title = 'Bronze'; emoji = '🥉'; bonus = 2; }
+            
+            // বর্তমান লেভেলের জন্য মোট প্রয়োজনীয় পয়েন্ট
+            let currentLevelTotal = 0;
+            for (let i = 1; i <= level; i++) {
+                currentLevelTotal += i * 100;
+            }
+            
+            // পরবর্তী লেভেলের জন্য মোট প্রয়োজনীয় পয়েন্ট
+            let nextLevelTotal = currentLevelTotal + ((level + 1) * 100);
+            
+            // প্রগ্রেস পার্সেন্টেজ
+            let progress = ((points - currentLevelTotal) / ((level + 1) * 100)) * 100;
+            if (progress > 100) progress = 100;
+            if (progress < 0) progress = 0;
+            
+            return {
+                level: level,
+                title: title,
+                emoji: emoji,
+                bonus: bonus,
+                points: points,
+                currentLevelTotal: currentLevelTotal,
+                nextLevelTotal: nextLevelTotal,
+                progress: Math.floor(progress),
+                requiredForNext: (level + 1) * 100,
+                isMaxLevel: level >= 100
+            };
+        }
+
+        function updateLevelUI() {
+            const levelData = calculateLevelData(
+                appState.balance,
+                appState.completedTasks,
+                appState.tapCount,
+                appState.dailyStreak,
+                appState.withdrawHistory ? appState.withdrawHistory.length : 0
+            );
+            
+            document.getElementById('levelTitle').textContent = `${levelData.emoji} ${levelData.title}`;
+            document.getElementById('levelNumber').textContent = `Level ${levelData.level}`;
+            document.getElementById('levelProgressFill').style.width = `${levelData.progress}%`;
+            
+            if (levelData.isMaxLevel) {
+                document.getElementById('levelCurrentPoints').textContent = `${levelData.points}`;
+                document.getElementById('levelNextPoints').textContent = `⭐ MAX LEVEL`;
+            } else {
+                const currentPoints = levelData.points - levelData.currentLevelTotal;
+                document.getElementById('levelCurrentPoints').textContent = `${currentPoints}`;
+                document.getElementById('levelNextPoints').textContent = `/ ${levelData.requiredForNext}`;
+            }
+            
+            // ইউজার লেভেল ব্যাজ আপডেট
+            document.getElementById('userLevel').textContent = `Level ${levelData.level}`;
+            
+            // লেভেল ডাটা সেভ
+            appState.userLevel = levelData.level;
+            appState.userLevelData = levelData;
+        }
+
         // ==================== WEEKLY BONUS SYSTEM ====================
         function getWeekStart(date) {
             const d = new Date(date);
@@ -541,8 +621,6 @@
                 let status = 'locked';
                 let statusText = '🔒 Locked';
                 let statusClass = 'locked';
-                let canClaim = false;
-                let showAd = false;
 
                 if (isClaimed) {
                     status = 'claimed';
@@ -553,12 +631,10 @@
                         status = 'available';
                         statusText = '🎁 Claim Now';
                         statusClass = 'available';
-                        canClaim = true;
                     } else {
                         status = 'ad-required';
                         statusText = '📺 Watch Ad';
                         statusClass = 'ad-required';
-                        showAd = true;
                     }
                 } else if (isPast && !isClaimed) {
                     status = 'locked';
@@ -585,7 +661,7 @@
                     </div>
                 `;
 
-                if (showAd && !isClaimed) {
+                if (status === 'ad-required' && !isClaimed) {
                     html += `
                         <div class="day-box" style="border-color: rgba(251,191,36,0.3);">
                             <div class="ad-box show" style="display:block;">
@@ -639,7 +715,6 @@
             claimWeeklyReward(day);
         }
 
-        // ===== Rewarded Interstitial Ad - উইকলি বোনাস =====
         function watchAdAndClaim(day) {
             const today = new Date().getDay();
             if (day !== today) {
@@ -694,6 +769,7 @@
             updateUI();
             updateUSDDisplay();
             updateWeeklyUI();
+            updateLevelUI();
             showToast(`Weekly bonus claimed! +${reward} coins`);
         }
 
@@ -756,7 +832,6 @@
             }
         }
 
-        // ===== In-app Interstitial - উইথড্রো =====
         function withdraw() {
             const usdBalance = appState.usdBalance || 0;
             const minWithdraw = appState.minWithdraw || 10;
@@ -798,6 +873,7 @@
             updateUI();
             updateUSDDisplay();
             updateWithdrawUI();
+            updateLevelUI();
             showToast(`Withdraw request $${withdrawAmount.toFixed(2)} sent for approval! 💳`);
         }
 
@@ -925,6 +1001,7 @@
 
                 updateUI();
                 updateUSDDisplay();
+                updateLevelUI();
                 showToast(`💰 Converted ${convertedCoins} Coins to $${usdEarned.toFixed(2)} USD!`);
             } else {
                 appState.lastConversion = Date.now();
@@ -1022,6 +1099,7 @@
             updateUI();
             updateTapUI();
             updateUSDDisplay();
+            updateLevelUI();
 
             userRef.update({
                 balance: appState.balance,
@@ -1148,6 +1226,7 @@
             updateUI();
             updateTapUI();
             updateUSDDisplay();
+            updateLevelUI();
             renderEnergyOffers();
 
             document.getElementById('energyBuyText').textContent = `You got +${energyAmount} Energy! ⚡`;
@@ -1248,6 +1327,7 @@
                     updateWeeklyUI();
                     updateWithdrawUI();
                     renderEnergyOffers();
+                    updateLevelUI();
                     
                     const today = new Date().toDateString();
                     userRef.update({
@@ -1309,6 +1389,7 @@
                     updateWithdrawUI();
                     updateRechargeTimer();
                     renderEnergyOffers();
+                    updateLevelUI();
                     startConversionTimer();
                 }
             });
@@ -1362,7 +1443,6 @@
             document.getElementById('completedTasks').textContent = appState.completedTasks;
             document.getElementById('referralCount').textContent = appState.referralCount;
             document.getElementById('dailyStreak').textContent = appState.dailyStreak;
-            document.getElementById('userLevel').textContent = `Level ${appState.userLevel}`;
             
             if (tg.initDataUnsafe?.user?.username) {
                 document.getElementById('userName').textContent = tg.initDataUnsafe.user.username;
@@ -1449,7 +1529,6 @@
             renderTasks(category);
         }
 
-        // ===== Rewarded Popup - টাস্ক কমপ্লিট =====
         function completeTask(taskId) {
             const task = tasks.find(t => t.id === taskId);
             if (!task || appState.tasksCompleted.includes(taskId)) return;
@@ -1486,6 +1565,7 @@
                         document.getElementById('successModal').classList.add('active');
                         updateUI();
                         updateUSDDisplay();
+                        updateLevelUI();
                     }
                 });
             }).catch((error) => {
@@ -1543,6 +1623,7 @@
                             <span style="flex:1;">${user.username || 'User'}</span>
                             <span style="color:#fbbf24; font-weight:bold;">${user.balance || 0} 🪙</span>
                             <span style="color:#22c55e; font-size:12px;">$${((user.balance || 0) / (appState.conversionRate || 1000)).toFixed(2)}</span>
+                            <span style="color:#3b82f6; font-size:11px;">Lv.${user.userLevel || 1}</span>
                         </div>
                     `).join('');
                 } else {
